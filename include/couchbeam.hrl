@@ -16,6 +16,9 @@
 
 -type header() :: {string() | atom(), string()}.
 -type headers() :: [header()].
+%% In R13B bool() is now called boolean()
+%% Uncomment if it's not compiling.
+%% -type boolean() :: bool().
 
 -record(couchdb_params, {
     host        = "127.0.0.1" :: string(),
@@ -78,4 +81,4 @@
     refs=dict:new()
 }).
     
--define(USER_AGENT, "couchbeam/0.4.1").
+-define(USER_AGENT, "couchbeam/0.4.3").

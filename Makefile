@@ -1,36 +1,23 @@
 ERL          ?= erl
-
-EBIN_DIRS    := $(wildcard deps/*/ebin)
-ERLC_FLAGS := -W $(INCLUDE_DIRS:%=-I %) $(EBIN_DIRS:%=-pa %)
+ERLC		     ?= erlc
 APP          := couchbeam
 
-all: lhttpc erl ebin/$(APP).app
-
-lhttpc:
-	@(cd deps/lhttpc;$(MAKE))
-
-erl:
-	@mkdir -p src/ebin
-	@$(ERL) -pa $(EBIN_DIRS) -noinput +B \
-	  -eval 'case make:all() of up_to_date -> halt(0); error -> halt(1) end.'
+all: doc
+	./rebar compile
 
 docs:
-	@mkdir -p doc
-	@$(ERL) -noshell -run edoc_run application '$(APP)' '"."' '[{preprocess, true},{includes, ["."]}]'
+	@mkdir -p doc/api
+	@$(ERL) -noshell -run edoc_run application '$(APP)' '"."' '[{preprocess, true},{includes, ["."]}, {dir, "./doc/api"}]'
 
 test: all
+	@$(ERLC) -o t/ t/etap.erl
 	prove t/*.t
 
 cover: all
 	COVER=1 prove t/*.t
-	erl -detached -noshell -eval 'etap_report:create()' -s init stop
+	@$(ERL) -detached -noshell -eval 'etap_report:create()' -s init stop
 
 clean: 
-	@echo "removing:"
-	@rm -fv ebin/*.beam ebin/*.app
-	@rm -fv deps/lhttpc/ebin/*.beam deps/lhttpc/ebin/*.app
-
-ebin/$(APP).app: src/$(APP).app
-	@cp -v src/$(APP).app $@
-
-
+	./rebar clean
+	@rm -f t/*.beam
+	@rm -rf docs/api

@@ -1,8 +1,7 @@
-doc/*.html
-ebin/
+ebin/*.beam
 *.swp
 *.dump
 edoc-info
 .DS_Store
-
-deps/lhttpc/doc/*.html
+deps/
+doc/api
