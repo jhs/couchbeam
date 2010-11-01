@@ -846,7 +846,13 @@ maybe_docid(Server, {DocProps}) ->
 %% @spec server_url({Host, Port}) -> iolist()
 server_url(#server{host=Host, port=Port, options=Options}) ->
     Ssl = couchbeam_util:get_value(is_ssl, Options, false),
-    server_url({Host, Port}, Ssl).
+    BasicCredentials = case proplists:lookup(basic_auth, Options) of
+        {basic_auth, {Username, Password}} ->
+            Username ++ ":" ++ Password ++ "@";
+        none ->
+            ""
+    end,
+    server_url({BasicCredentials ++ Host, Port}, Ssl).
 
 %% @doc Assemble the server URL for the given client
 %% @spec server_url({Host, Port}, Ssl) -> iolist()
